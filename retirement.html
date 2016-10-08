@@ -1,0 +1,337 @@
+<html><head><title>Retirement Planner</title>
+
+<style type="text/css">
+BODY{
+margin:50px;
+font-family: arial;
+font-size:12pt;
+}
+
+.title{
+font-size:14pt;
+text-align:left;
+font-weight:bold;
+}
+
+.decimal{
+font-size:10pt;
+}
+
+td{
+vertical-align:top;
+height: 47px;
+}
+
+input[type=text]{
+width: 125px;
+font-family: arial;
+}
+
+.readonly{
+background-color:#DDDDDD;
+}
+
+.subtotal{
+font-weight:bold;
+background-color:#DDDDDD;
+}
+
+.final{
+font-weight:bold;
+font-size:16px;
+border:0px;
+}
+</style>
+
+<script language="JavaScript"><!--
+
+function round(value, decimals){
+	return Number(Math.round(value+'e'+decimals)+'e-'+decimals);
+}
+
+function money(amount){
+	return amount.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+}
+
+function calculate(){   // by Bradley K. Harris, 2016
+
+var sName = document.getElementById('sName').value;
+var sBalance = parseFloat(document.getElementById('sCurrentBalance').value);
+var monthlySRate = document.getElementById('sAnnualRate').value/12;
+var sYearCount = document.getElementById('sYearCount').value;
+var sMonthCount = sYearCount*12;
+var sMonth = 1;
+var sYear = 0;
+
+var bName = document.getElementById('bName').value;
+var bYearCount = document.getElementById('bRetireAge').value - document.getElementById('bCurrentAge').value;
+var bMonthCount = bYearCount*12;
+var bSalary = parseFloat(document.getElementById('bSalary').value);
+var bContributionRate = document.getElementById('bContribution').value;
+var bBonus = parseFloat(document.getElementById('bBonus').value);
+var bSalaryIncrease = parseFloat(document.getElementById('bSalaryIncrease').value);
+var bMonthlyRate = document.getElementById('bAnnualRate').value/12;
+var bMonth = 1;
+var bYear = 0;
+var bBalance = parseFloat(document.getElementById('bCurrentBalance').value);
+
+var lName = document.getElementById('lName').value;
+var lYearCount = document.getElementById('lRetireAge').value - document.getElementById('lCurrentAge').value;
+var lMonthCount = lYearCount*12;
+var lSalary = parseFloat(document.getElementById('lSalary').value);
+var lContributionRate = document.getElementById('lContribution').value;
+var lBonus = parseFloat(document.getElementById('lBonus').value);
+var lSalaryIncrease = parseFloat(document.getElementById('lSalaryIncrease').value);
+var lMonthlyRate = document.getElementById('lAnnualRate').value/12;
+var lMonth = 1;
+var lYear = 0;
+var lBalance = parseFloat(document.getElementById('lCurrentBalance').value);
+
+// First Yearly Stats for Account 1
+var log1 = "<b>Account 1<br>"
+
+// Add account name if available
+if (bName != ""){
+	log1 += "(" + bName + ")";
+}
+
+log1 += "</b><br><br>";
+log1 += "<u>Current</u><br>Salary: " + money(bSalary);
+log1 += "<br>Monthly Contribution: " + money(bContributionRate*bSalary/12);
+log1 += "<br>Bonus Contribution: ";
+
+if (document.getElementById('bBonusPercent').checked == true) {
+	log1 += money(bBonus*bSalary);
+} else {
+	log1 += money(bBonus);
+}
+
+log1 += "<br>Account Balance: " + money(bBalance) + "<br><br>";
+
+// First Yearly Stats for Account 2
+var log2 = "<b>Account 2<br>"
+
+if (lName != ""){
+	log2 += "(" + lName + ")";
+}
+
+log2 += "</b><br><br>";
+log2 += "<u>Current</u><br>Salary: " + money(lSalary);
+log2 += "<br>Monthly Contribution: " + money(lContributionRate*lSalary/12);
+log2 += "<br>Bonus Contribution: ";
+
+if (document.getElementById('lBonusPercent').checked == true) {
+	log2 += money(lBonus*lSalary);
+} else {
+	log2 += money(lBonus);
+}
+
+log2 += "<br>Account Balance: " + money(lBalance) + "<br><br>";
+
+// First Yearly Stats for Account 3
+var log3 = "<b>Account 3<br>"
+
+if (sName != ""){
+	log3 += "(" + sName + ")";
+}
+
+log3 += "</b><br><br>";
+log3 += "<u>Current</u><br>Account Balance: " + money(sBalance) + "<br><br><br><br><br>";
+
+// Main loop for Account 1
+while (bMonth <= bMonthCount){
+	bMonthlyContribution = bContributionRate*bSalary/12;
+	newBBalance = (bBalance + bMonthlyContribution) * (1 + bMonthlyRate);
+	bBalance = round(newBBalance, 2);
+	bMonth += 1;
+	
+	if (bMonth%12 == 0) { // Once a year, raises salary, adds bonus contribution, and logs stats
+		if (document.getElementById('bBonusPercent').checked == true) {
+			bYearlyBonus = bBonus*bSalary;
+		} else {
+			bYearlyBonus = bBonus;
+		}
+		
+		bYear += 1;
+		bBalance += round(bYearlyBonus, 2);
+		newBSalary = bSalary*(1 + bSalaryIncrease);
+		bSalary = round(newBSalary, 2);
+
+		log1 += "<u>Year " + bYear + "</u><br>Salary: " + money(bSalary);
+		log1 += "<br>Monthly Contribution: " + money(bMonthlyContribution) + "<br>Bonus Contribution: " + money(bYearlyBonus);
+		log1 += "<br>Account Balance: " + money(bBalance) + "<br><br>";
+	}
+}
+
+// Main loop for Account 2
+while (lMonth <= lMonthCount){
+	lMonthlyContribution = lContributionRate*lSalary/12;
+	newLBalance = (lBalance + lMonthlyContribution) * (1 + lMonthlyRate);
+	lBalance = round(newLBalance, 2);
+	lMonth += 1;
+	
+	if (lMonth%12 == 0) { // Once a year, raises salary, adds bonus contribution, and logs stats
+		if (document.getElementById('lBonusPercent').checked == true) {
+			lYearlyBonus = lBonus*lSalary;
+		} else {
+			lYearlyBonus = lBonus;
+		}
+
+		lYear += 1;
+		lBalance += round(lYearlyBonus, 2);
+		newLSalary = lSalary*(1 + lSalaryIncrease);
+		lSalary = round(newLSalary, 2);
+
+		log2 += "<u>Year " + lYear + "</u><br>Salary: " + money(lSalary);
+		log2 += "<br>Monthly Contribution: " + money(lMonthlyContribution) + "<br>Bonus Contribution: " + money(lYearlyBonus);
+		log2 += "<br>Account Balance: " + money(lBalance) + "<br><br>";
+	}
+}
+
+// Main loop for Account 3
+while (sMonth <= sMonthCount){
+	newSBalance = sBalance * (1 + monthlySRate);
+	sBalance = round(newSBalance, 2);
+	sMonth += 1;
+
+	if (sMonth%12 == 0) {
+		sYear +=1;
+		log3 += "<u>Year " + sYear + "</u><br>Account Balance: " + money(sBalance) + "<br><br><br><br><br>";
+	}
+}
+
+// Grand total
+var finalT = bBalance + lBalance + sBalance;
+
+document.getElementById('bFinal').value=money(bBalance);
+document.getElementById('lFinal').value=money(lBalance);
+document.getElementById('sFinal').value=money(sBalance);
+document.getElementById('totalFinal').value=money(finalT);
+
+if (document.getElementById('logcheck').checked == true) {
+	document.getElementById('yearlyLog1').innerHTML=log1;
+	document.getElementById('yearlyLog2').innerHTML=log2;
+	document.getElementById('yearlyLog3').innerHTML=log3;
+	}
+}
+
+// Fills in the age difference for Accounts 1 & 2
+function yearCount(){
+document.getElementById('bYearCount').value=document.getElementById('bRetireAge').value-document.getElementById('bCurrentAge').value;
+document.getElementById('lYearCount').value=document.getElementById('lRetireAge').value-document.getElementById('lCurrentAge').value;
+}
+
+--></script>
+
+</head>
+
+<body onLoad="yearCount();">
+
+<p class="title">Retirement Planner</p>
+
+This calculates the balances of 3 accounts at retirement age. It assumes that interest is compounded monthly.<br>
+Enter all monetary amounts without dollar signs or commas. Enter all percentages as decimals.<br><br>
+
+<table border="0" cellspacing="0" cellpadding="5">
+<tr>
+ <th></th>
+ <th>Account 1</th>
+ <th>Account 2</th>
+ <th>Account 3</th>
+</tr>
+<tr>
+ <td>Name<br><font class="decimal">(optional)</font></td>
+ <td><input type="text" value="Name1" id="bName"></td>
+ <td><input type="text" value="Name2" id="lName"></td>
+ <td><input type="text" value="Shared" id="sName"></td>
+</tr>
+<tr>
+ <td>Current Age</td>
+ <td><input type="text" value="22" id="bCurrentAge" onChange="yearCount();"></td>
+ <td><input type="text" value="25" id="lCurrentAge" onChange="yearCount();"></td>
+ <td></td>
+</tr>
+<tr>
+ <td>Age at Retirement</td>
+ <td><input type="text" value="62" id="bRetireAge" onChange="yearCount();"></td>
+ <td><input type="text" value="62" id="lRetireAge" onChange="yearCount();"></td>
+ <td></td>
+</tr>
+<tr>
+ <td>Years until Retirement</td>
+ <td><input type="text" value="" id="bYearCount" readonly class="readonly"></td>
+ <td><input type="text" value="" id="lYearCount" readonly class="readonly"></td>
+ <td><input type="text" value="35" id="sYearCount"></td>
+</tr>
+<tr>
+ <td>Current Account Balance</td>
+ <td><input type="text" value="1000" id="bCurrentBalance"></td>
+ <td><input type="text" value="1500" id="lCurrentBalance"></td>
+ <td><input type="text" value="2000" id="sCurrentBalance"></td>
+</tr>
+<tr>
+ <td>Annual Interest Rate for Account<br><font class="decimal">(expressed as a decimal)</font></td>
+ <td><input type="text" value=".07" id="bAnnualRate"></td>
+ <td><input type="text" value=".07" id="lAnnualRate"></td>
+ <td><input type="text" value=".07" id="sAnnualRate"></td>
+</tr>
+<tr>
+ <td>Current Salary</td>
+ <td><input type="text" value="50000" id="bSalary"></td>
+ <td><input type="text" value="65000" id="lSalary"></td>
+ <td></td>
+</tr>
+<tr>
+ <td>Percentage Annual Salary Increase<br><font class="decimal">(expressed as a decimal)</font></td>
+ <td><input type="text" value=".02" id="bSalaryIncrease"></td>
+ <td><input type="text" value=".02" id="lSalaryIncrease"></td>
+ <td></td>
+</tr>
+<tr>
+ <td>Contribution Rate<br><font class="decimal">(expressed as a decimal)</font></td>
+ <td><input type="text" value=".06" id="bContribution"></td>
+ <td><input type="text" value=".1" id="lContribution"></td>
+ <td></td>
+</tr>
+<tr>
+ <td>Annual Bonus Contribution</td>
+ <td>
+   <input type="text" value=".02" id="bBonus"><br>
+   <form>
+   <input type="radio" name="bbonustype" id="bBonusFixed" value="fixed"><font class="decimal">Fixed Amount</font><br>
+   <input type="radio" name="bbonustype" id="bBonusPercent" value="percent" checked><font class="decimal">Percent of Salary</font>
+   </form>
+ </td>
+ <td><input type="text" value="500" id="lBonus"><br>
+   <form>
+   <input type="radio" name="lbonustype" id="lBonusFixed" value="fixed" checked><font class="decimal">Fixed Amount</font><br>
+   <input type="radio" name="lbonustype" id="lBonusPercent" value="percent"><font class="decimal">Percent of Salary</font><br>
+   </form>
+ </td>
+ <td></td>
+</tr>
+<tr>
+ <td>Final Balance</td>
+ <td><input type="text" id="bFinal" readonly class="subtotal"></td>
+ <td><input type="text" id="lFinal" readonly class="subtotal"></td>
+ <td><input type="text" id="sFinal" readonly class="subtotal"></td>
+</tr>
+<tr>
+ <td>
+   <input type="button" value="Calculate" onclick="calculate()">
+   <input type="checkbox" id="logcheck" checked>Show Yearly Stats
+ </td>
+ <td align="right" colspan="2"><b>Total Final Balance:</b></td>
+ <td><input type="text" id="totalFinal" readonly class="final"></td>
+</tr>
+</table><br>
+
+<table border="0" cellspacing="0" cellpadding="20">
+<tr>
+<td><div id="yearlyLog1"></div></td>
+<td><div id="yearlyLog2"></div></td>
+<td><div id="yearlyLog3"></div></td>
+</tr>
+</table>
+
+</body></html>
