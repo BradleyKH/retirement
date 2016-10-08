@@ -208,10 +208,15 @@ document.getElementById('lFinal').value=money(lBalance);
 document.getElementById('sFinal').value=money(sBalance);
 document.getElementById('totalFinal').value=money(finalT);
 
+// Populates yearly stats, or not
 if (document.getElementById('logcheck').checked == true) {
 	document.getElementById('yearlyLog1').innerHTML=log1;
 	document.getElementById('yearlyLog2').innerHTML=log2;
 	document.getElementById('yearlyLog3').innerHTML=log3;
+	} else {
+	document.getElementById('yearlyLog1').innerHTML=" ";
+	document.getElementById('yearlyLog2').innerHTML=" ";
+	document.getElementById('yearlyLog3').innerHTML=" ";
 	}
 }
 
